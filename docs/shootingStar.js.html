@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: skymap_page/BackgroundStar.js</title>
+    <title>JSDoc: Source: shootingStar.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: skymap_page/BackgroundStar.js</h1>
+    <h1 class="page-title">Source: shootingStar.js</h1>
 
     
 
@@ -27,53 +27,26 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
- * This class is intended for non interactable stars. Given a coordinate
- * for its absolute location it will draw a star there, and update given
- * the user_x and user_y
+ * Set background shooting star animation
+ * Require: HTMLDivElement id="stars-div"
+ * @param {Document} document document of target page
  */
-export class BackgroundStar {
-  /**
-   * Takes x and y coordinates for star, along with radius and color
-   * @param {Number} x
-   * @param {Number} y
-   * @param {Number} radius
-   * @param {String} color
-   */
-  constructor(x, y, radius, color) {
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.color = color;
+export function setShootingStars(document) {
+  const starsDiv = document.getElementById("stars-div");
+  function createStar() {
+    for (let i = 0; i &lt; 16; i++) {
+      let star = document.createElement("div");
+      star.classList.add("star");
+      star.style.top = `${Math.random() * window.innerWidth}px`;
+      star.style.left = `${Math.random() * window.innerWidth}px`;
+      star.style.animationDelay = `${Math.random() * 2}s`;
+      starsDiv.appendChild(star);
+    }
   }
-
-  /**
-   * Draws the background star given the current user x and y
-   * @param {Number} user_x user view offset x
-   * @param {Number} user_y user view offset y
-   */
-  draw(user_x, user_y) {
-    ctx.strokeStyle = this.color;
-    ctx.beginPath();
-    ctx.arc(
-      this.x + user_x,
-      this.y + user_y,
-      this.radius,
-      0,
-      Math.PI * 2,
-      false,
-    );
-    ctx.fill();
-    ctx.stroke();
-  }
-
-  /**
-   * Update function to be called by animation loop, takes user x and y
-   * @param {Number} user_x user view offset x
-   * @param {Number} user_y user view offset y
-   */
-  update(user_x, user_y) {
-    this.draw(user_x, user_y);
-  }
+  createStar();
+  setInterval(() => {
+    createStar();
+  }, 3000);
 }
 </code></pre>
         </article>
