@@ -26,15 +26,20 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import playBgMusic from "/utils/playmusic/script";
+            <pre class="prettyprint source linenums"><code>import playClickSound from "/utils/playclick/script";
+import playBgMusic from "/utils/playmusic/script";
+
+let synthExist;
 
 /**
  * @property {Function} init retrieves info from previous page
  * @property {Function} initializeConstellation initalize constellations
+ * @property {Function} stopTalkWhenReload stop voice over when reload/back a page
+ * @property {Function} stopSpeechSynthesis stop voice over
  */
 
 // array of constellations - name, description, constellation image link, myth image link
-const constellationList = [
+let constellationList = [
   {
     name: "Aries",
     description:
@@ -92,21 +97,35 @@ const constellationList = [
     mythLink: "/assets/constellation/ursa/myth/img",
   },
 ];
+let backgroundMusic;
 
+let synth;
 window.addEventListener("DOMContentLoaded", init);
 /**
  * Retrieves info from previous page
  */
 function init() {
-  const backgroundMusic = document.getElementById("background-music");
-  playBgMusic(backgroundMusic, true);
+  backgroundMusic = document.getElementById("background-music");
+  playBgMusic(backgroundMusic);
 
   initializeConstellation();
-
-  const continueButton = document.getElementById("continue-button");
-  continueButton.addEventListener("click", () => {
-    localStorage.setItem("musicPlayTime", backgroundMusic.currentTime);
-  });
+  // get chosen voice from localstorage
+  const chosenVoice = localStorage.getItem("voiceChoice");
+  synth = window.speechSynthesis;
+  let utterance = new SpeechSynthesisUtterance();
+  let list;
+  //Start speaking
+  if (chosenVoice != -1) {
+    synth.addEventListener("voiceschanged", () => {
+      list = synth.getVoices();
+      utterance.voice = list[chosenVoice];
+      utterance.text = document.getElementById("description").textContent;
+      synth.speak(utterance);
+      synthExist = 1;
+    });
+  } else {
+    synthExist = -1;
+  }
 }
 
 /**
@@ -132,6 +151,36 @@ function initializeConstellation() {
   const mythImage = document.getElementById("myth-image");
   mythImage.src = chosenConstellation["mythLink"];
 }
+
+const continueButton = document.getElementById("continue-button");
+continueButton.addEventListener("click", function () {
+  playClickSound(
+    document.getElementById("clickSound"),
+    localStorage.getItem("questionType"),
+    backgroundMusic.currentTime,
+    () => (window.location.href = "/response/page")
+  );
+  stopSpeechSynthesis();
+});
+
+stopTalkWhenReload();
+/**
+ * voiceover stops when page reloaded/goes to previuos page.
+ */
+function stopTalkWhenReload() {
+  //These event listeners stop the voicing when user reload or navigate back to previous page.
+  window.addEventListener("beforeunload", stopSpeechSynthesis);
+  window.addEventListener("unload", stopSpeechSynthesis);
+}
+
+/**
+ * stops speech
+ */
+function stopSpeechSynthesis() {
+  if (synthExist == 1 &amp;&amp; synth.speaking) {
+    synth.cancel();
+  }
+}
 </code></pre>
         </article>
     </section>
@@ -142,13 +191,13 @@ function initializeConstellation() {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Background.html">Background</a></li><li><a href="BackgroundStar.html">BackgroundStar</a></li><li><a href="Constellation.html">Constellation</a></li><li><a href="ConstellationStar.html">ConstellationStar</a></li></ul><h3>Global</h3><ul><li><a href="global.html#animate">animate</a></li><li><a href="global.html#animateText">animateText</a></li><li><a href="global.html#constellationList">constellationList</a></li><li><a href="global.html#displayText">displayText</a></li><li><a href="global.html#fetchResponses">fetchResponses</a></li><li><a href="global.html#handleClickCanvas">handleClickCanvas</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#initializeConstellation">initializeConstellation</a></li><li><a href="global.html#loadJsonData">loadJsonData</a></li><li><a href="global.html#redirectToPage">redirectToPage</a></li><li><a href="global.html#setCanvasPanning">setCanvasPanning</a></li><li><a href="global.html#setRatio">setRatio</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Background.html">Background</a></li><li><a href="BackgroundStar.html">BackgroundStar</a></li><li><a href="Constellation.html">Constellation</a></li><li><a href="ConstellationStar.html">ConstellationStar</a></li></ul><h3>Global</h3><ul><li><a href="global.html#animate">animate</a></li><li><a href="global.html#animateText">animateText</a></li><li><a href="global.html#constellationList">constellationList</a></li><li><a href="global.html#displayText">displayText</a></li><li><a href="global.html#fetchResponses">fetchResponses</a></li><li><a href="global.html#goToPage">goToPage</a></li><li><a href="global.html#handleClickCanvas">handleClickCanvas</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#initializeConstellation">initializeConstellation</a></li><li><a href="global.html#loadJsonData">loadJsonData</a></li><li><a href="global.html#redirectToPage">redirectToPage</a></li><li><a href="global.html#setCanvasPanning">setCanvasPanning</a></li><li><a href="global.html#setRatio">setRatio</a></li><li><a href="global.html#stopSpeechSynthesis">stopSpeechSynthesis</a></li><li><a href="global.html#stopTalkWhenReload">stopTalkWhenReload</a></li><li><a href="global.html#toLandingPage">toLandingPage</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Sat Jun 08 2024 20:10:58 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Sat Jun 08 2024 20:33:25 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>
