@@ -28,6 +28,7 @@
         <article>
             <pre class="prettyprint source linenums"><code>import { Background } from "/skymap/background/script";
 import { Constellation } from "/skymap/constellation/script";
+import playBgMusic from "/utils/playmusic/script";
 
 const debug = false;
 
@@ -66,6 +67,7 @@ const constellationList = [
   },
 ];
 
+const backgroundMusic = document.getElementById("background-music");
 let cameraOffset;
 let constellation_arr;
 
@@ -76,6 +78,8 @@ window.addEventListener("DOMContentLoaded", init);
  * @Property {Function} Starts the program, all function calls trace back here
  */
 async function init() {
+  playBgMusic(backgroundMusic, true);
+
   const { cloc, connect } = await loadJsonData();
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
@@ -94,11 +98,11 @@ async function init() {
         cloc[name],
         ratio,
         canvas.width,
-        canvas.height,
-      ),
+        canvas.height
+      )
   );
   canvas.addEventListener("click", (event) =>
-    handleClickCanvas(event, constellation_arr, sky_background),
+    handleClickCanvas(event, constellation_arr, sky_background)
   );
   // Begin animation
   animate(canvas, ctx, constellation_arr, sky_background, cameraOffset);
@@ -117,7 +121,7 @@ function setRatio() {
   let desiredHeight = screenHeight * 2;
   return Math.max(
     Math.ceil(desiredHeight / defaultHeight),
-    Math.ceil(desiredWidth / defaultWidth),
+    Math.ceil(desiredWidth / defaultWidth)
   );
 }
 
@@ -279,7 +283,7 @@ function zoomOutCanvas(finalConstellation) {
       : canvas.height - 1080 * rate;
 
   constellation_arr.forEach((constellation) =>
-    constellation.updateRatio(ratio),
+    constellation.updateRatio(ratio)
   );
 }
 
@@ -314,9 +318,9 @@ function decideConstellation(constellation_arr, sky_background) {
     finalConstellation,
     constellationList[
       constellationList.findIndex(
-        (item) => item.name === finalConstellation.name,
+        (item) => item.name === finalConstellation.name
       )
-    ].imageLink,
+    ].imageLink
   );
 
   // Show button to next page
@@ -326,6 +330,11 @@ function decideConstellation(constellation_arr, sky_background) {
   // Record the result to the local storage
   finalConstellation.setChosen(true);
   localStorage.setItem("chosenConstellation", finalConstellation.name);
+
+  // Store music play time to local storage before navigating to the next page
+  document.querySelector("a").addEventListener("click", () => {
+    localStorage.setItem("musicPlayTime", backgroundMusic.currentTime);
+  });
 }
 
 /**
@@ -333,7 +342,7 @@ function decideConstellation(constellation_arr, sky_background) {
  */
 function animate(canvas, ctx, constellation_arr, sky_background, cameraOffset) {
   requestAnimationFrame(() =>
-    animate(canvas, ctx, constellation_arr, sky_background, cameraOffset),
+    animate(canvas, ctx, constellation_arr, sky_background, cameraOffset)
   );
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   sky_background.update(cameraOffset.x, cameraOffset.y, ratio);
@@ -345,18 +354,6 @@ function animate(canvas, ctx, constellation_arr, sky_background, cameraOffset) {
     // Update offset
     constellation.setOffset(cameraOffset.x, cameraOffset.y);
   }
-}
-
-/**
- * @Property {Function} Navigation
- */
-function goToPage() {
-  playClickSound(
-    document.getElementById("clickSound"),
-    localStorage.getItem("questionType"),
-    backgroundMusic.currentTime,
-    () => (window.location.href = "/explanation/page"),
-  );
 }
 
 /**
@@ -380,13 +377,13 @@ async function loadJsonData() {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Background.html">Background</a></li><li><a href="BackgroundStar.html">BackgroundStar</a></li><li><a href="Constellation.html">Constellation</a></li><li><a href="ConstellationStar.html">ConstellationStar</a></li></ul><h3>Global</h3><ul><li><a href="global.html#animate">animate</a></li><li><a href="global.html#animateText">animateText</a></li><li><a href="global.html#constellationList">constellationList</a></li><li><a href="global.html#displayText">displayText</a></li><li><a href="global.html#fetchResponses">fetchResponses</a></li><li><a href="global.html#goToPage">goToPage</a></li><li><a href="global.html#handleClickCanvas">handleClickCanvas</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#initializeConstellation">initializeConstellation</a></li><li><a href="global.html#loadJsonData">loadJsonData</a></li><li><a href="global.html#redirectToPage">redirectToPage</a></li><li><a href="global.html#setCanvasPanning">setCanvasPanning</a></li><li><a href="global.html#setRatio">setRatio</a></li><li><a href="global.html#stopSpeechSynthesis">stopSpeechSynthesis</a></li><li><a href="global.html#stopTalkWhenReload">stopTalkWhenReload</a></li><li><a href="global.html#toLandingPage">toLandingPage</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Background.html">Background</a></li><li><a href="BackgroundStar.html">BackgroundStar</a></li><li><a href="Constellation.html">Constellation</a></li><li><a href="ConstellationStar.html">ConstellationStar</a></li></ul><h3>Global</h3><ul><li><a href="global.html#animate">animate</a></li><li><a href="global.html#animateText">animateText</a></li><li><a href="global.html#constellationList">constellationList</a></li><li><a href="global.html#displayText">displayText</a></li><li><a href="global.html#fetchResponses">fetchResponses</a></li><li><a href="global.html#handleClickCanvas">handleClickCanvas</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#initializeConstellation">initializeConstellation</a></li><li><a href="global.html#loadJsonData">loadJsonData</a></li><li><a href="global.html#redirectToPage">redirectToPage</a></li><li><a href="global.html#setCanvasPanning">setCanvasPanning</a></li><li><a href="global.html#setRatio">setRatio</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Sat Jun 08 2024 20:36:39 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Sat Jun 08 2024 20:39:18 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>
