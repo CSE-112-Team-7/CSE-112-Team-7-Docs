@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: skymap_page/BackgroundStar.js</title>
+    <title>JSDoc: Source: thankyou_page/thankyou.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: skymap_page/BackgroundStar.js</h1>
+    <h1 class="page-title">Source: thankyou_page/thankyou.js</h1>
 
     
 
@@ -26,54 +26,40 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * This class is intended for non interactable stars. Given a coordinate
- * for its absolute location it will draw a star there, and update given
- * the user_x and user_y
+            <pre class="prettyprint source linenums"><code>import playClickSound from "/utils/playclick/script";
+import playBgMusic from "/utils/playmusic/script";
+
+//const analyticsPageName = "thankYou";
+//const analyticsStatus = 0;
+let backgroundMusic;
+//analyticsManager.defaultPageAnalytics(analyticsPageName, analyticsStatus);
+
+/**
+ * @property {Function} toLandingPage sends user back to landing page
+ * @property {Function} init initalize name to landing page.
  */
-export class BackgroundStar {
-  /**
-   * Takes x and y coordinates for star, along with radius and color
-   * @param {Number} x
-   * @param {Number} y
-   * @param {Number} radius
-   * @param {String} color
-   */
-  constructor(x, y, radius, color) {
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.color = color;
-  }
+/**
+ * Directs user back to the landing page
+ */
+function toLandingPage() {
+  playClickSound(
+    document.getElementById("clickSound"),
+    localStorage.getItem("questionType"),
+    backgroundMusic.currentTime,
+    () => (window.location.href = "../landing_page/landing.html")
+  );
+}
 
-  /**
-   * Draws the background star given the current user x and y
-   * @param {Number} user_x user view offset x
-   * @param {Number} user_y user view offset y
-   */
-  draw(user_x, user_y) {
-    ctx.strokeStyle = this.color;
-    ctx.beginPath();
-    ctx.arc(
-      this.x + user_x,
-      this.y + user_y,
-      this.radius,
-      0,
-      Math.PI * 2,
-      false
-    );
-    ctx.fill();
-    ctx.stroke();
-  }
+// Run the init() function when the page has loaded
+window.addEventListener("DOMContentLoaded", init);
 
-  /**
-   * Update function to be called by animation loop, takes user x and y
-   * @param {Number} user_x user view offset x
-   * @param {Number} user_y user view offset y
-   */
-  update(user_x, user_y) {
-    this.draw(user_x, user_y);
-  }
+/**
+ * Directs user back to the landing page
+ */
+async function init() {
+  backgroundMusic = document.getElementById("background-music");
+  playBgMusic(backgroundMusic);
+  window.toLandingPage = toLandingPage;
 }
 </code></pre>
         </article>
