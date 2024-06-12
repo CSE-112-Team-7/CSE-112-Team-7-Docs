@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: skymap_page/BackgroundStar.js</title>
+    <title>JSDoc: Source: signup_page/signup.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: skymap_page/BackgroundStar.js</h1>
+    <h1 class="page-title">Source: signup_page/signup.js</h1>
 
     
 
@@ -26,53 +26,71 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * This class is intended for non interactable stars. Given a coordinate
- * for its absolute location it will draw a star there, and update given
- * the user_x and user_y
+            <pre class="prettyprint source linenums"><code>import playBgMusic from "/utils/playmusic/script";
+
+window.addEventListener("DOMContentLoaded", init);
+
+/**
+ * @constant {string} password stores the id of the new user's password
+ * @constant {string} conf_password stores the id of the new user's confirmation password
+ * @constant {string} backgroundMusic stores the id of the background music
  */
-export class BackgroundStar {
-  /**
-   * Takes x and y coordinates for star, along with radius and color
-   * @param {Number} x
-   * @param {Number} y
-   * @param {Number} radius
-   * @param {String} color
-   */
-  constructor(x, y, radius, color) {
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.color = color;
-  }
+const password = document.getElementById("new_password");
+const conf_password = document.getElementById("new_password_conf");
+const backgroundMusic = document.getElementById("background-music");
 
-  /**
-   * Draws the background star given the current user x and y
-   * @param {Number} user_x user view offset x
-   * @param {Number} user_y user view offset y
-   */
-  draw(user_x, user_y) {
-    ctx.strokeStyle = this.color;
-    ctx.beginPath();
-    ctx.arc(
-      this.x + user_x,
-      this.y + user_y,
-      this.radius,
-      0,
-      Math.PI * 2,
-      false
-    );
-    ctx.fill();
-    ctx.stroke();
-  }
+/**
+ * Sends a POST request with the new user's username and password to the database, and handles request status.
+ */
+function init() {
+  playBgMusic(backgroundMusic, true);
 
-  /**
-   * Update function to be called by animation loop, takes user x and y
-   * @param {Number} user_x user view offset x
-   * @param {Number} user_y user view offset y
-   */
-  update(user_x, user_y) {
-    this.draw(user_x, user_y);
+  password.onchange = confirmPassword;
+  conf_password.onkeyup = confirmPassword;
+
+  document
+    .getElementById("myForm")
+    .addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      let formData = new FormData(this);
+
+      let xhr = new XMLHttpRequest();
+
+      xhr.open("POST", "/signup/attempt", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+
+      xhr.onload = function () {
+        const takenUser = document.getElementById("takenUsername");
+        const ukProb = document.getElementById("unknownProblem");
+        if (xhr.status === 201) {
+          console.log("Successful login");
+          takenUser.style.visibility = "hidden";
+          ukProb.style.display = "none";
+          window.location.href = "/selection/page";
+        } else if (xhr.status === 200) {
+          takenUser.style.visibility = "visible";
+          ukProb.style.display = "none";
+          console.error("Error:", xhr.statusText);
+        } else if (xhr.status === 204) {
+          takenUser.style.visibility = "hidden";
+          ukProb.style.display = "block";
+          console.error("Error:", xhr.statusText);
+        }
+      };
+
+      xhr.send(JSON.stringify(Object.fromEntries(formData)));
+    });
+}
+
+/**
+ * Checks if the confirmation password and password matches.
+ */
+function confirmPassword() {
+  if (password.value != conf_password.value) {
+    conf_password.setCustomValidity("Passwords Do Not Match");
+  } else {
+    conf_password.setCustomValidity("");
   }
 }
 </code></pre>
