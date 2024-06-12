@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: signup_page/signup.js</title>
+    <title>JSDoc: Source: selection_page/selection.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: signup_page/signup.js</h1>
+    <h1 class="page-title">Source: selection_page/selection.js</h1>
 
     
 
@@ -30,67 +30,74 @@
 
 window.addEventListener("DOMContentLoaded", init);
 
-/**
- * @constant {string} password stores the id of the new user's password
- * @constant {string} conf_password stores the id of the new user's confirmation password
- * @constant {string} backgroundMusic stores the id of the background music
- */
-const password = document.getElementById("new_password");
-const conf_password = document.getElementById("new_password_conf");
 const backgroundMusic = document.getElementById("background-music");
+const selectionButtons = document.querySelectorAll("main button");
+const icon = document.querySelector("img");
+const startButton = document.querySelector("a");
+const nextButton = document.querySelector(".button");
+
+let selectedButton = null;
 
 /**
- * Sends a POST request with the new user's username and password to the database, and handles request status.
+ * Play background music, all function calls in selection page trace back here
  */
 function init() {
   playBgMusic(backgroundMusic, true);
 
-  password.onchange = confirmPassword;
-  conf_password.onkeyup = confirmPassword;
+  // clear local storage from previous selection
+  localStorage.removeItem("questionType");
+  localStorage.removeItem("chosenConstellation");
+  selectionButtons.forEach(function (element) {
+    element.addEventListener("click", handleSelection);
+  });
 
-  document
-    .getElementById("myForm")
-    .addEventListener("submit", function (event) {
-      event.preventDefault();
-
-      let formData = new FormData(this);
-
-      let xhr = new XMLHttpRequest();
-
-      xhr.open("POST", "/signup/attempt", true);
-      xhr.setRequestHeader("Content-Type", "application/json");
-
-      xhr.onload = function () {
-        const takenUser = document.getElementById("takenUsername");
-        const ukProb = document.getElementById("unknownProblem");
-        if (xhr.status === 201) {
-          console.log("Successful login");
-          takenUser.style.visibility = "hidden";
-          ukProb.style.display = "none";
-          window.location.href = "/selection/page";
-        } else if (xhr.status === 200) {
-          takenUser.style.visibility = "visible";
-          ukProb.style.display = "none";
-          console.error("Error:", xhr.statusText);
-        } else if (xhr.status === 204) {
-          takenUser.style.visibility = "hidden";
-          ukProb.style.display = "block";
-          console.error("Error:", xhr.statusText);
-        }
-      };
-
-      xhr.send(JSON.stringify(Object.fromEntries(formData)));
-    });
+  nextButton.addEventListener("click", () => {
+    localStorage.setItem("musicPlayTime", backgroundMusic.currentTime);
+  });
 }
 
 /**
- * Checks if the confirmation password and password matches.
+ * Handle selection of categories to make sure only one category
+ * is selected at one time, update icon image accordingly, and
+ * store the category into local storage
+ * @param {Element} element category button
  */
-function confirmPassword() {
-  if (password.value != conf_password.value) {
-    conf_password.setCustomValidity("Passwords Do Not Match");
-  } else {
-    conf_password.setCustomValidity("");
+function handleSelection(element) {
+  let clickedButton = element.target;
+
+  let questionType = clickedButton.innerHTML;
+  // update icon image based on the selected category
+  if (questionType === "RELATIONSHIP") {
+    icon.src = "/assets/icons/rel/img";
+    icon.alt = "relationship icon";
+  } else if (questionType === "HEALTH") {
+    icon.src = "/assets/icons/health/img";
+    icon.alt = "health icon";
+  } else if (questionType === "CAREER") {
+    icon.src = "/assets/icons/career/img";
+    icon.alt = "career icon";
+  } else if (questionType === "HOROSCOPE") {
+    icon.src = "/assets/icons/daily_scope/img";
+    icon.alt = "horoscope icon";
+  }
+
+  if (selectedButton === null) {
+    // if no button is previously selected, select the clicked button
+    clickedButton.style.backgroundColor = "var(--button-hover-background)";
+
+    localStorage.setItem("questionType", questionType);
+    selectedButton = clickedButton;
+
+    startButton.style.display = "block";
+    icon.style.display = "block";
+  } else if (clickedButton != selectedButton) {
+    // unselect the previously selected button, select the clicked button
+    selectedButton.style.backgroundColor = "var(--button-background)";
+
+    clickedButton.style.backgroundColor = "var(--button-hover-background)";
+
+    localStorage.setItem("questionType", questionType);
+    selectedButton = clickedButton;
   }
 }
 </code></pre>
